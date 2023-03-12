@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Translate</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="button">go</string>
+    <string name="no_user_input">Введите логин и пароль</string>
+    <string name="logIn">Log In</string>
+    <string name="signUp">Sign Up</string>
+</resources>
