@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         login = findViewById(R.id.login);
         password = findViewById(R.id.password);
-        button = findViewById(R.id.button);
+        button = findViewById(R.id.btnTranslate);
         switcher = findViewById(R.id.switcher);
 
         dbHelper = DBHelper.create(this);
@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
             contentValues.put(DBHelper.KEY_PASSWORD, users_password);
             database.insert(DBHelper.TABLE_CONTACTS, null, contentValues);
 
+            // заменить на getLastInsertRowId()
             cursor = database.query(DBHelper.TABLE_CONTACTS, null, String.format("%s = '%s'", DBHelper.KEY_LOGIN, users_login), null, null, null, null);
             cursor.moveToFirst();
             int indexId = cursor.getColumnIndex(DBHelper.KEY_ID);

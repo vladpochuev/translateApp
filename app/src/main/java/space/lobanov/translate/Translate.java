@@ -1,12 +1,20 @@
 package space.lobanov.translate;
 
+import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,8 +32,13 @@ import okhttp3.Response;
 public class Translate extends AppCompatActivity {
     private EditText source;
     private TextView result;
-    private Button button;
+    private Button btnTranslate;
+    private Button btnReset;
+    private Button btnCopy;
+    private Spinner spLangFrom;
+    private Spinner spLangTo;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,27 +46,57 @@ public class Translate extends AppCompatActivity {
 
         source = findViewById(R.id.source);
         result = findViewById(R.id.result);
-        button = findViewById(R.id.button);
+        btnTranslate = findViewById(R.id.btnTranslate);
+        btnReset = findViewById(R.id.btnReset);
+        btnCopy = findViewById(R.id.btnCopy);
+
+        spLangFrom = findViewById(R.id.langFrom);
+        spLangTo = findViewById(R.id.langTo);
 
         Window w = getWindow();
         w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        button.setOnClickListener(l -> {
+        setAdapter();
+        
+        btnReset.setOnClickListener(l -> {
+            source.setText("");
+            result.setText("");
+        });
+
+        btnCopy.setOnClickListener(l -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("text", result.getText());
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(getApplicationContext(), "Текст скопирован в буфер обмена", Toast.LENGTH_SHORT).show();
+        });
+
+        btnTranslate.setOnClickListener(l -> {
             String text = source.getText().toString().trim();
             new GetURLData().execute(text);
         });
+    }
+
+    private void setAdapter(){
+        Languages[] values = Languages.values();
+        ArrayAdapter<Languages> langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, values);
+        langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spLangFrom.setAdapter(langAdapter);
+        spLangTo.setAdapter(langAdapter);
     }
     private class GetURLData extends AsyncTask<String, String, String>{
         @Override
         protected String doInBackground(String... strings) {
             String text = strings[0];
+            Languages langTo = (Languages) spLangTo.getSelectedItem();
+            Languages langFrom = (Languages) spLangFrom.getSelectedItem();
 
             OkHttpClient client = new OkHttpClient();
             Response response;
 
             MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType, String.format("{\"translateMode\":\"html\",\"platform\":\"api\",\"to\":\"ru_RU\",\"from\":\"en_GB\",\"data\":\"%s\"}", text));
+            RequestBody body = RequestBody.create(mediaType, String.format("{\"translateMode\":\"html\",\"platform\":\"api\",\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}", langTo.getCode(), langFrom.getCode(),  text));
             Request request = new Request.Builder()
                     .url("https://api-b2b.backenster.com/b1/api/v3/translate")
                     .post(body)
@@ -63,6 +106,7 @@ public class Translate extends AppCompatActivity {
                     .build();
             try {
                 response = client.newCall(request).execute();
+                System.out.println("Access");
                 return response.body().string();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -73,6 +117,7 @@ public class Translate extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             try {
+                System.out.println(s);
                 JSONObject jsonObject = new JSONObject(s);
                 String translate = jsonObject.getString("result");
                 result.setText(translate);
