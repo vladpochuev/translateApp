@@ -8,8 +8,8 @@ import androidx.annotation.Nullable;
 public class DBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "translate";
-    public static final String TABLE_CONTACTS = "users";
 
+    public static final String TABLE_CONTACTS = "users";
     public static final String KEY_ID = "_id";
     public static final String KEY_LOGIN = "_login";
     public static final String KEY_PASSWORD = "_password";

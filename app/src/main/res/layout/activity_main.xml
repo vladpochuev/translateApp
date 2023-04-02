@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:text="@string/button"
         android:layout_marginHorizontal="130sp"
-        android:layout_marginTop="380dp" />
+        android:layout_marginTop="380dp"/>
 
     <Switch
         android:id="@+id/switcher"

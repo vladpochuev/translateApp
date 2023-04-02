@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -30,11 +31,14 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class Translate extends AppCompatActivity {
+
+    ArrayAdapter<Languages> langAdapter;
     private EditText source;
     private TextView result;
     private Button btnTranslate;
     private Button btnReset;
     private Button btnCopy;
+    private Button btnSwap;
     private Spinner spLangFrom;
     private Spinner spLangTo;
 
@@ -49,6 +53,7 @@ public class Translate extends AppCompatActivity {
         btnTranslate = findViewById(R.id.btnTranslate);
         btnReset = findViewById(R.id.btnReset);
         btnCopy = findViewById(R.id.btnCopy);
+        btnSwap = findViewById(R.id.btnSwap);
 
         spLangFrom = findViewById(R.id.langFrom);
         spLangTo = findViewById(R.id.langTo);
@@ -71,6 +76,14 @@ public class Translate extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Текст скопирован в буфер обмена", Toast.LENGTH_SHORT).show();
         });
 
+        btnSwap.setOnClickListener(l -> {
+            Languages leftSpinner = (Languages) spLangFrom.getSelectedItem();
+            Languages rightSpinner = (Languages) spLangTo.getSelectedItem();
+
+            spLangFrom.setSelection(langAdapter.getPosition(rightSpinner));
+            spLangTo.setSelection(langAdapter.getPosition(leftSpinner));
+        });
+
         btnTranslate.setOnClickListener(l -> {
             String text = source.getText().toString().trim();
             new GetURLData().execute(text);
@@ -79,12 +92,30 @@ public class Translate extends AppCompatActivity {
 
     private void setAdapter(){
         Languages[] values = Languages.values();
-        ArrayAdapter<Languages> langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, values);
+        langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, values);
         langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spLangFrom.setAdapter(langAdapter);
         spLangTo.setAdapter(langAdapter);
+
+        Languages localLang = getLocale();
+
+        spLangFrom.setSelection(langAdapter.getPosition(Languages.English));
+        spLangTo.setSelection(langAdapter.getPosition(localLang));
     }
+
+    private Languages getLocale() {
+        Locale current = Locale.getDefault();
+        String curCode = current.getLanguage() + "_" + current.getCountry();
+
+        for (Languages language : Languages.values()) {
+            if(curCode.equals(language.getCode())){
+                return language;
+            }
+        }
+        return Languages.Ukrainian;
+    }
+
     private class GetURLData extends AsyncTask<String, String, String>{
         @Override
         protected String doInBackground(String... strings) {
