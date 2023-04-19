@@ -1,9 +1,14 @@
 package space.lobanov.translate;
 
+import static space.lobanov.translate.DBHelper.HistoryTable.*;
+
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 
 import okhttp3.MediaType;
@@ -152,8 +158,39 @@ public class Translate extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject(s);
                 String translate = jsonObject.getString("result");
                 result.setText(translate);
+                System.out.println(result.getText());
             } catch (JSONException e) {
                 throw new RuntimeException(e);
+            }
+
+            SQLiteDatabase database = DBHelper.database.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            Languages langSource = (Languages) spLangFrom.getSelectedItem();
+            Languages langResult = (Languages) spLangTo.getSelectedItem();
+
+            values.put(HISTORY_USER_ID, User.user.getId());
+            values.put(HISTORY_SOURCE_LANG, langSource.name());
+            values.put(HISTORY_RESULT_LANG, langResult.name());
+            values.put(HISTORY_SOURCE, source.getText().toString().trim());
+            values.put(HISTORY_RESULT, result.getText().toString().trim());
+            values.put(HISTORY_DATE, new Date().toString());
+
+            System.out.println(result.getText() + " ");
+
+            database.insert(HISTORY_TABLE_CONTACTS, null, values);
+
+            SQLiteDatabase db = DBHelper.database.getReadableDatabase();
+            Cursor cursor = db.query(HISTORY_TABLE_CONTACTS, null, null, null, null, null, null);
+
+            while (cursor.moveToNext()){
+                @SuppressLint("Range") int userId = cursor.getInt(cursor.getColumnIndex(HISTORY_USER_ID));
+                @SuppressLint("Range") String sourceLang = cursor.getString(cursor.getColumnIndex(HISTORY_SOURCE_LANG));
+                @SuppressLint("Range") String resultLang = cursor.getString(cursor.getColumnIndex(HISTORY_RESULT_LANG));
+                @SuppressLint("Range") String source = cursor.getString(cursor.getColumnIndex(HISTORY_SOURCE));
+                @SuppressLint("Range") String result = cursor.getString(cursor.getColumnIndex(HISTORY_RESULT));
+                @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex(HISTORY_DATE));
+
+                System.out.printf("Id : %d, SouceLang : %s, ResultLang : %s, Source : %s, Result : %s, Date : %s\n", userId, sourceLang, resultLang, source, result, date);
             }
         }
     }

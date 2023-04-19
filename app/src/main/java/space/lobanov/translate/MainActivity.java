@@ -1,5 +1,7 @@
 package space.lobanov.translate;
 
+import static space.lobanov.translate.DBHelper.UsersTable.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -21,10 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private static Button button;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private static Switch switcher;
-    DBHelper dbHelper;
-
-    String users_login;
-    String users_password;
+    private String users_login;
+    private String users_password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.btnTranslate);
         switcher = findViewById(R.id.switcher);
 
-        dbHelper = DBHelper.create(this);
+        DBHelper.database = DBHelper.create(this);
 
 
         button.setOnClickListener(l -> {
@@ -59,18 +59,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void signIn(){
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-        Cursor cursor = database.query(DBHelper.TABLE_CONTACTS, null, String.format("%s = '%s'", DBHelper.KEY_LOGIN, users_login), null, null, null, null);
+        SQLiteDatabase database = DBHelper.database.getReadableDatabase();
+        Cursor cursor = database.query(USERS_TABLE_CONTACTS, null, String.format("%s = '%s'", USERS_KEY_LOGIN, users_login), null, null, null, null);
 
         if(!cursor.moveToFirst()){
             Toast.makeText(this,"Неверный логин",Toast.LENGTH_LONG).show();
         } else {
-            int passwordIndex = cursor.getColumnIndex(DBHelper.KEY_PASSWORD);
+            int passwordIndex = cursor.getColumnIndex(USERS_KEY_PASSWORD);
             String password = cursor.getString(passwordIndex);
 
             if(users_password.equals(password)){
-                int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
-                int id = cursor.getInt(idIndex);
+                int idIndex = cursor.getColumnIndex(USERS_KEY_ID);
+                long id = cursor.getInt(idIndex);
                 recordInfo(id, users_login);
             } else {
                 Toast.makeText(this,"Неверный пароль",Toast.LENGTH_LONG).show();
@@ -81,31 +81,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signUp() {
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-        Cursor cursor = database.query(DBHelper.TABLE_CONTACTS, null, String.format("%s = '%s'", DBHelper.KEY_LOGIN, users_login), null, null, null, null);
+        SQLiteDatabase database = DBHelper.database.getWritableDatabase();
+        Cursor cursor = database.query(USERS_TABLE_CONTACTS, null, String.format("%s = '%s'", USERS_KEY_LOGIN, users_login), null, null, null, null);
         if (cursor.getCount()!=0) {
             Toast.makeText(this,"Пользователь уже зарегистрирован", Toast.LENGTH_LONG).show();
         } else {
             ContentValues contentValues = new ContentValues();
 
-            contentValues.put(DBHelper.KEY_LOGIN, users_login);
-            contentValues.put(DBHelper.KEY_PASSWORD, users_password);
-            database.insert(DBHelper.TABLE_CONTACTS, null, contentValues);
-
-            // заменить на getLastInsertRowId()
-            cursor = database.query(DBHelper.TABLE_CONTACTS, null, String.format("%s = '%s'", DBHelper.KEY_LOGIN, users_login), null, null, null, null);
-            cursor.moveToFirst();
-            int indexId = cursor.getColumnIndex(DBHelper.KEY_ID);
-            int id = cursor.getInt(indexId);
+            contentValues.put(USERS_KEY_LOGIN, users_login);
+            contentValues.put(USERS_KEY_PASSWORD, users_password);
+            long id = database.insert(USERS_TABLE_CONTACTS, null, contentValues);
 
             recordInfo(id, users_login);
             cursor.close();
+            database.close();
         }
         cursor.close();
-        dbHelper.close();
+        DBHelper.database.close();
     }
 
-    private void recordInfo(int id, String login){
+    private void recordInfo(long id, String login){
         new User(id, login);
         System.out.println(User.user);
         Intent intent = new Intent(MainActivity.this, Translate.class);

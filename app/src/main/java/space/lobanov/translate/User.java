@@ -2,18 +2,17 @@ package space.lobanov.translate;
 
 public class User {
     public static User user;
-
-    private int id;
+    private long id;
     private String login;
 
-    public User(int id, String login) {
+    public User(long id, String login) {
         this.id = id;
         this.login = login;
 
         user = this;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
