@@ -166,7 +166,13 @@
             android:layout_height="475px"
             android:layout_marginTop="35px"
             android:background="@color/white"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/historyList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/container8"

@@ -1,7 +1,5 @@
 package space.lobanov.translate;
 
-import static space.lobanov.translate.DBHelper.UsersTable.*;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -18,10 +16,13 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    @SuppressLint("StaticFieldLeak")
     private static EditText login;
+    @SuppressLint("StaticFieldLeak")
     private static EditText password;
+    @SuppressLint("StaticFieldLeak")
     private static Button button;
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    @SuppressLint({"UseSwitchCompatOrMaterialCode", "StaticFieldLeak"})
     private static Switch switcher;
     private String users_login;
     private String users_password;
@@ -60,16 +61,17 @@ public class MainActivity extends AppCompatActivity {
     }
     private void signIn(){
         SQLiteDatabase database = DBHelper.database.getReadableDatabase();
-        Cursor cursor = database.query(USERS_TABLE_CONTACTS, null, String.format("%s = '%s'", USERS_KEY_LOGIN, users_login), null, null, null, null);
+        UsersTable table = new UsersTable();
+        Cursor cursor = database.query(table.CONTACTS, null, String.format("%s = '%s'", table.LOGIN, users_login), null, null, null, null);
 
         if(!cursor.moveToFirst()){
             Toast.makeText(this,"Неверный логин",Toast.LENGTH_LONG).show();
         } else {
-            int passwordIndex = cursor.getColumnIndex(USERS_KEY_PASSWORD);
+            int passwordIndex = cursor.getColumnIndex(table.PASSWORD);
             String password = cursor.getString(passwordIndex);
 
             if(users_password.equals(password)){
-                int idIndex = cursor.getColumnIndex(USERS_KEY_ID);
+                int idIndex = cursor.getColumnIndex(table.ID);
                 long id = cursor.getInt(idIndex);
                 recordInfo(id, users_login);
             } else {
@@ -82,15 +84,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void signUp() {
         SQLiteDatabase database = DBHelper.database.getWritableDatabase();
-        Cursor cursor = database.query(USERS_TABLE_CONTACTS, null, String.format("%s = '%s'", USERS_KEY_LOGIN, users_login), null, null, null, null);
+        UsersTable table = new UsersTable();
+        Cursor cursor = database.query(table.CONTACTS, null, String.format("%s = '%s'", table.LOGIN, users_login), null, null, null, null);
         if (cursor.getCount()!=0) {
             Toast.makeText(this,"Пользователь уже зарегистрирован", Toast.LENGTH_LONG).show();
         } else {
             ContentValues contentValues = new ContentValues();
 
-            contentValues.put(USERS_KEY_LOGIN, users_login);
-            contentValues.put(USERS_KEY_PASSWORD, users_password);
-            long id = database.insert(USERS_TABLE_CONTACTS, null, contentValues);
+            contentValues.put(table.LOGIN, users_login);
+            contentValues.put(table.PASSWORD, users_password);
+            long id = database.insert(table.CONTACTS, null, contentValues);
 
             recordInfo(id, users_login);
             cursor.close();

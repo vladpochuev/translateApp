@@ -1,11 +1,8 @@
 package space.lobanov.translate;
 
-import static space.lobanov.translate.DBHelper.HistoryTable.*;
-
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,10 +10,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -45,8 +43,9 @@ public class Translate extends AppCompatActivity {
     private Button btnReset;
     private Button btnCopy;
     private Button btnSwap;
-    private Spinner spLangFrom;
-    private Spinner spLangTo;
+    private Spinner spinnerLangFrom;
+    private Spinner spinnerLangTo;
+    private ListView historyList;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -60,15 +59,17 @@ public class Translate extends AppCompatActivity {
         btnReset = findViewById(R.id.btnReset);
         btnCopy = findViewById(R.id.btnCopy);
         btnSwap = findViewById(R.id.btnSwap);
+        historyList = findViewById(R.id.historyList);
 
-        spLangFrom = findViewById(R.id.langFrom);
-        spLangTo = findViewById(R.id.langTo);
+        spinnerLangFrom = findViewById(R.id.langFrom);
+        spinnerLangTo = findViewById(R.id.langTo);
 
         Window w = getWindow();
         w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        setAdapter();
+        setAdapters();
+
         
         btnReset.setOnClickListener(l -> {
             source.setText("");
@@ -83,11 +84,11 @@ public class Translate extends AppCompatActivity {
         });
 
         btnSwap.setOnClickListener(l -> {
-            Languages leftSpinner = (Languages) spLangFrom.getSelectedItem();
-            Languages rightSpinner = (Languages) spLangTo.getSelectedItem();
+            Languages leftSpinner = (Languages) spinnerLangFrom.getSelectedItem();
+            Languages rightSpinner = (Languages) spinnerLangTo.getSelectedItem();
 
-            spLangFrom.setSelection(langAdapter.getPosition(rightSpinner));
-            spLangTo.setSelection(langAdapter.getPosition(leftSpinner));
+            spinnerLangFrom.setSelection(langAdapter.getPosition(rightSpinner));
+            spinnerLangTo.setSelection(langAdapter.getPosition(leftSpinner));
         });
 
         btnTranslate.setOnClickListener(l -> {
@@ -96,18 +97,28 @@ public class Translate extends AppCompatActivity {
         });
     }
 
-    private void setAdapter(){
+    private void setAdapters(){
+        setLangAdapter();
+        setHistoryAdapter();
+    }
+
+    private void setLangAdapter(){
         Languages[] values = Languages.values();
         langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, values);
         langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        spLangFrom.setAdapter(langAdapter);
-        spLangTo.setAdapter(langAdapter);
+        spinnerLangFrom.setAdapter(langAdapter);
+        spinnerLangTo.setAdapter(langAdapter);
 
         Languages localLang = getLocale();
 
-        spLangFrom.setSelection(langAdapter.getPosition(Languages.English));
-        spLangTo.setSelection(langAdapter.getPosition(localLang));
+        spinnerLangFrom.setSelection(langAdapter.getPosition(Languages.English));
+        spinnerLangTo.setSelection(langAdapter.getPosition(localLang));
+    }
+
+    private void setHistoryAdapter(){
+        ItemAdapter itemAdapter = new ItemAdapter(this, HistoryItem.getElements());
+        historyList.setAdapter(itemAdapter);
     }
 
     private Languages getLocale() {
@@ -126,8 +137,8 @@ public class Translate extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             String text = strings[0];
-            Languages langTo = (Languages) spLangTo.getSelectedItem();
-            Languages langFrom = (Languages) spLangFrom.getSelectedItem();
+            Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
+            Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
 
             OkHttpClient client = new OkHttpClient();
             Response response;
@@ -154,44 +165,25 @@ public class Translate extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             try {
-                System.out.println(s);
                 JSONObject jsonObject = new JSONObject(s);
                 String translate = jsonObject.getString("result");
                 result.setText(translate);
-                System.out.println(result.getText());
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
 
-            SQLiteDatabase database = DBHelper.database.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            Languages langSource = (Languages) spLangFrom.getSelectedItem();
-            Languages langResult = (Languages) spLangTo.getSelectedItem();
+            Languages langSource = (Languages) spinnerLangFrom.getSelectedItem();
+            Languages langResult = (Languages) spinnerLangTo.getSelectedItem();
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-            values.put(HISTORY_USER_ID, User.user.getId());
-            values.put(HISTORY_SOURCE_LANG, langSource.name());
-            values.put(HISTORY_RESULT_LANG, langResult.name());
-            values.put(HISTORY_SOURCE, source.getText().toString().trim());
-            values.put(HISTORY_RESULT, result.getText().toString().trim());
-            values.put(HISTORY_DATE, new Date().toString());
+            HistoryItem item = new HistoryItem(User.user.getId(), langSource.name(),
+                    langResult.name(), source.getText().toString().trim(),
+                    result.getText().toString().trim(), dateFormat.format(date));
 
-            System.out.println(result.getText() + " ");
+            item.insert();
 
-            database.insert(HISTORY_TABLE_CONTACTS, null, values);
-
-            SQLiteDatabase db = DBHelper.database.getReadableDatabase();
-            Cursor cursor = db.query(HISTORY_TABLE_CONTACTS, null, null, null, null, null, null);
-
-            while (cursor.moveToNext()){
-                @SuppressLint("Range") int userId = cursor.getInt(cursor.getColumnIndex(HISTORY_USER_ID));
-                @SuppressLint("Range") String sourceLang = cursor.getString(cursor.getColumnIndex(HISTORY_SOURCE_LANG));
-                @SuppressLint("Range") String resultLang = cursor.getString(cursor.getColumnIndex(HISTORY_RESULT_LANG));
-                @SuppressLint("Range") String source = cursor.getString(cursor.getColumnIndex(HISTORY_SOURCE));
-                @SuppressLint("Range") String result = cursor.getString(cursor.getColumnIndex(HISTORY_RESULT));
-                @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex(HISTORY_DATE));
-
-                System.out.printf("Id : %d, SouceLang : %s, ResultLang : %s, Source : %s, Result : %s, Date : %s\n", userId, sourceLang, resultLang, source, result, date);
-            }
+            setHistoryAdapter();
         }
     }
 }
