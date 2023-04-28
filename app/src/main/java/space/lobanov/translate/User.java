@@ -1,5 +1,7 @@
 package space.lobanov.translate;
 
+import androidx.annotation.NonNull;
+
 public class User {
     public static User user;
     private long id;
@@ -20,6 +22,7 @@ public class User {
         return login;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +

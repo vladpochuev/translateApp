@@ -1,6 +1,7 @@
 package space.lobanov.translate;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -21,30 +22,33 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     private static EditText password;
     @SuppressLint("StaticFieldLeak")
-    private static Button button;
+    private static Button btnContinue;
     @SuppressLint({"UseSwitchCompatOrMaterialCode", "StaticFieldLeak"})
     private static Switch switcher;
     private String users_login;
     private String users_password;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Window w = getWindow();
-        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION //скрываем нижнюю панель навигации
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY); // появляется поверх приложения и исчезает
+        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);// - скрыть нижнюю панель навигации
+        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);//- нижняя панель будет появляться только при вызове и исчезать через несколько секунд
+
 
         login = findViewById(R.id.login);
         password = findViewById(R.id.password);
-        button = findViewById(R.id.btnTranslate);
+        btnContinue = findViewById(R.id.btnContinue);
         switcher = findViewById(R.id.switcher);
 
         DBHelper.database = DBHelper.create(this);
 
 
-        button.setOnClickListener(l -> {
+        btnContinue.setOnClickListener(l -> {
             users_login = login.getText().toString().trim();
             users_password = password.getText().toString().trim();
 

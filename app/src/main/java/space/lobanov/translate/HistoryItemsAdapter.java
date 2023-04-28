@@ -13,12 +13,12 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemAdapter extends ArrayAdapter<HistoryItem> {
+public class HistoryItemsAdapter extends ArrayAdapter<HistoryItem> {
 
     private Context context;
     private List<HistoryItem> items;
 
-    public ItemAdapter(Context context, ArrayList<HistoryItem> items) {
+    public HistoryItemsAdapter(Context context, ArrayList<HistoryItem> items) {
         super(context, R.layout.item, items);
         this.context = context;
         this.items = items;

@@ -1,184 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F1F0F5"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Translate">
 
-    <LinearLayout
-        android:id="@+id/container1"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F2F1F6"
-        android:gravity="start"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:background="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/bottomAppBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/container2"
-            android:layout_width="match_parent"
-            android:layout_height="150px"
-            android:background="@color/purple_500"
-            android:orientation="horizontal">
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <FrameLayout
-                android:layout_width="460px"
-                android:layout_height="match_parent"
-                android:layout_gravity="end">
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:contentInsetStart="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="BottomAppBar">
 
-                <Spinner
-                    android:id="@+id/langFrom"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textAlignment="center" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="160px"
-                android:layout_height="match_parent"
-                android:background="#F1F0F5">
-
-                <Button
-                    android:id="@+id/btnSwap"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:background="@color/white" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="460px"
-                android:layout_height="match_parent">
-
-                <Spinner
-                    android:id="@+id/langTo"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textAlignment="center" />
-            </FrameLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container3"
-            android:layout_width="match_parent"
-            android:layout_height="435px"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/source"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:backgroundTint="#00FFFFFF"
-                android:ems="10"
-                android:gravity="top"
-                android:hint="Введите текст"
-                android:inputType="textMultiLine|textPersonName"
-                android:padding="20dp"
-                android:textAlignment="textStart"
-                android:textColorHighlight="@color/teal_200"
-                android:textColorLink="@color/purple_500"
-                tools:ignore="RtlCompat" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="150px"
-                android:layout_weight="6">
-
-                <Button
-                    android:id="@+id/btnReset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp" />
-            </FrameLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container4"
-            android:layout_width="match_parent"
-            android:layout_height="110px"
-            android:layout_gravity="center|center_horizontal"
-            android:background="@color/teal_200"
-            android:gravity="center|center_horizontal|center_vertical"
-            android:orientation="horizontal">
-
-            <FrameLayout
-                android:layout_width="110px"
-                android:layout_height="match_parent"
-                android:layout_gravity="center">
-
-                <Button
-                    android:id="@+id/btnTranslate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal" />
-            </FrameLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container5"
-            android:layout_width="match_parent"
-            android:layout_height="435px"
-            android:background="@color/white"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/result"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#FFFFFF"
-                android:hint="Перевод"
-                android:padding="20dp"
-                android:textColor="#191919"
-                android:textSize="18sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container6"
-            android:layout_width="match_parent"
-            android:layout_height="110px"
-            android:layout_gravity="right"
-            android:background="@color/teal_200"
-            android:gravity="right"
-            android:orientation="horizontal">
-
-            <FrameLayout
-                android:layout_width="100px"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:layout_marginEnd="5dp">
-
-                <Button
-                    android:id="@+id/btnCopy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </FrameLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container7"
-            android:layout_width="match_parent"
-            android:layout_height="475px"
-            android:layout_marginTop="35px"
-            android:background="@color/white"
-            android:orientation="horizontal">
-
-            <ListView
-                android:id="@+id/historyList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/container8"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#F2F1F6"
-            android:orientation="horizontal"></LinearLayout>
-    </LinearLayout>
-</RelativeLayout>
+            android:background="#2D2D2D"
+            app:itemIconTint="@color/bottom_nav_color"
+
+            app:itemRippleColor="#AAAAAA"
+            app:itemTextColor="@color/bottom_nav_color"
+            app:menu="@menu/bottom_nav_menu" />
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
