@@ -14,5 +14,4 @@
         android:id="@+id/quiz"
         android:icon="@drawable/baseline_quiz_24"
         android:title="Quiz"/>
-
 </menu>

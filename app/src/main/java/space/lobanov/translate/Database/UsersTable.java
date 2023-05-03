@@ -1,4 +1,4 @@
-package space.lobanov.translate;
+package space.lobanov.translate.Database;
 
 public class UsersTable {
     public final String CONTACTS = "users";

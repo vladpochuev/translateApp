@@ -7,7 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
-public class HistoryItem {
+import space.lobanov.translate.Database.DBHelper;
+import space.lobanov.translate.Database.HistoryTable;
+
+public class TranslationInfo {
     private long id;
     private String sourceLang;
     private String resultLang;
@@ -15,12 +18,20 @@ public class HistoryItem {
     private String result;
     private String date;
 
-    public HistoryItem(long id, String sourceLang, String resultLang, String source, String result, String date) {
+    public TranslationInfo(long id, String sourceLang, String resultLang, String source, String result, String date) {
         this.id = id;
         this.sourceLang = sourceLang;
         this.resultLang = resultLang;
         this.source = source;
         this.result = result;
+        this.date = date;
+    }
+
+    public TranslationInfo(long id, String sourceLang, String resultLang, String source, String date) {
+        this.id = id;
+        this.sourceLang = sourceLang;
+        this.resultLang = resultLang;
+        this.source = source;
         this.date = date;
     }
 
@@ -39,9 +50,9 @@ public class HistoryItem {
         database.insert(table.CONTACTS, null, values);
     }
 
-    public static ArrayList<HistoryItem> getElements(){
+    public static ArrayList<TranslationInfo> getElements(){
         HistoryTable table = new HistoryTable();
-        ArrayList<HistoryItem> elements = new ArrayList<>();
+        ArrayList<TranslationInfo> elements = new ArrayList<>();
 
         SQLiteDatabase db = DBHelper.database.getReadableDatabase();
         Cursor cursor = db.query(table.CONTACTS, null, table.USER_ID + " = " + User.user.getId(), null, null, null, table.DATE + " DESC");
@@ -54,7 +65,7 @@ public class HistoryItem {
             @SuppressLint("Range") String result = cursor.getString(cursor.getColumnIndex(table.RESULT));
             @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex(table.DATE));
 
-            HistoryItem item = new HistoryItem(userId, sourceLang, resultLang, source, result, date);
+            TranslationInfo item = new TranslationInfo(userId, sourceLang, resultLang, source, result, date);
             elements.add(item);
         }
         return elements;
@@ -82,5 +93,29 @@ public class HistoryItem {
 
     public String getDate() {
         return date;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setSourceLang(String sourceLang) {
+        this.sourceLang = sourceLang;
+    }
+
+    public void setResultLang(String resultLang) {
+        this.resultLang = resultLang;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

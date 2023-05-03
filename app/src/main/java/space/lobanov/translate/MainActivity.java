@@ -1,7 +1,6 @@
 package space.lobanov.translate;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -15,6 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import space.lobanov.translate.Database.DBHelper;
+import space.lobanov.translate.Database.UsersTable;
 
 public class MainActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")

@@ -4,12 +4,20 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+import space.lobanov.translate.Fragments.HomeFragment;
+import space.lobanov.translate.Fragments.ListFragment;
+import space.lobanov.translate.Fragments.QuizFragment;
+
 public class Translate extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
@@ -24,13 +32,11 @@ public class Translate extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translate);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, homeFragment).commit();
+        bottomNavigationView.setSelectedItemId(R.id.home);
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -44,6 +50,7 @@ public class Translate extends AppCompatActivity {
                         return true;
                     case R.id.quiz:
                         getSupportFragmentManager().beginTransaction().replace(R.id.container, quizFragment).commit();
+                        return true;
                 }
                 return false;
             }

@@ -1,4 +1,4 @@
-package space.lobanov.translate;
+package space.lobanov.translate.Fragments;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -34,12 +32,19 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import space.lobanov.translate.Adapters.LangItemsAdapter;
+import space.lobanov.translate.TranslationInfo;
+import space.lobanov.translate.Adapters.HistoryItemsAdapter;
+import space.lobanov.translate.Languages;
+import space.lobanov.translate.R;
+import space.lobanov.translate.Translate;
+import space.lobanov.translate.User;
 
 public class HomeFragment extends Fragment {
 
     private Translate mActivity;
 
-    ArrayAdapter<Languages> langAdapter;
+    LangItemsAdapter langAdapter;
     private EditText source;
     private TextView result;
     private ImageButton btnTranslate;
@@ -69,14 +74,7 @@ public class HomeFragment extends Fragment {
         mActivity = (Translate) getActivity();
 
         connectResources();
-
-        Window w = mActivity.getWindow();
-        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);// - скрыть нижнюю панель навигации
-        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);//-нижняя панель будет появляться только при вызове и исчезать через несколько секунд
-
         setAdapters();
-
 
         btnReset.setOnClickListener(l -> {
             source.setText("");
@@ -99,8 +97,12 @@ public class HomeFragment extends Fragment {
         });
 
         btnTranslate.setOnClickListener(l -> {
-            String text = source.getText().toString().trim();
-            new GetURLData().execute(text);
+            if (!source.getText().toString().trim().equals("")) {
+                String text = source.getText().toString().trim();
+                new GetTranslation().execute(text);
+            } else {
+                Toast.makeText(mActivity, "Введите текст", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -125,8 +127,7 @@ public class HomeFragment extends Fragment {
 
     private void setLangAdapter(){
         Languages[] values = Languages.values();
-        langAdapter = new ArrayAdapter<>(mActivity, android.R.layout.simple_spinner_item, values);
-        langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        langAdapter = new LangItemsAdapter(mActivity, R.layout.lang_spinner_title, R.layout.lang_spinner_dropdown, values);
 
         spinnerLangFrom.setAdapter(langAdapter);
         spinnerLangTo.setAdapter(langAdapter);
@@ -138,7 +139,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void setHistoryAdapter(){
-        HistoryItemsAdapter historyItemsAdapter = new HistoryItemsAdapter(mActivity, HistoryItem.getElements());
+        HistoryItemsAdapter historyItemsAdapter = new HistoryItemsAdapter(mActivity, TranslationInfo.getElements());
         historyList.setAdapter(historyItemsAdapter);
     }
 
@@ -154,57 +155,72 @@ public class HomeFragment extends Fragment {
         return Languages.Ukrainian;
     }
 
-    private class GetURLData extends AsyncTask<String, String, String> {
+
+    private class GetTranslation extends AsyncTask<String, String, String> {
+        TranslationInfo item;
         @Override
         protected String doInBackground(String... strings) {
-            String text = strings[0];
-            Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
-            Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
+            item = getInfo(strings[0]);
+            return executeRequest();
+        }
 
+        private TranslationInfo getInfo(String text){
+            Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
+            Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+            return new TranslationInfo(User.user.getId(), langFrom.getCode(), langTo.getCode(),
+                    text, dateFormat.format(date));
+        }
+
+        private String executeRequest(){
             OkHttpClient client = new OkHttpClient();
             Response response;
 
-            MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType, String.format("{\"translateMode\":\"html\",\"platform\":\"api\",\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}", langTo.getCode(), langFrom.getCode(),  text));
-            Request request = new Request.Builder()
-                    .url("https://api-b2b.backenster.com/b1/api/v3/translate")
-                    .post(body)
-                    .addHeader("accept", "application/json")
-                    .addHeader("content-type", "application/json")
-                    .addHeader("Authorization", "a_fhvZYBPKemWAf00YLModU78yhoTduTE6gDzuibkunlUmch4GO9lOZp0DImFijwpdqKpGK8r3s8laNkoM")
-                    .build();
+            Request request = buildRequest();
             try {
                 response = client.newCall(request).execute();
-                System.out.println("Access");
                 return response.body().string();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
+        private Request buildRequest(){
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType,
+                    String.format("{\"translateMode\":\"html\",\"platform\":\"api\"," +
+                            "\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}",
+                            item.getResultLang(), item.getSourceLang(), item.getSource()));
+            return new Request.Builder()
+                    .url("https://api-b2b.backenster.com/b1/api/v3/translate")
+                    .post(body)
+                    .addHeader("accept", "application/json")
+                    .addHeader("content-type", "application/json")
+                    .addHeader("Authorization", "a_fhvZYBPKemWAf00YLModU78yhoTduTE6gDzuibkunlUmch4GO9lOZp0DImFijwpdqKpGK8r3s8laNkoM")
+                    .build();
+        }
+
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(String json) {
+            super.onPostExecute(json);
+
+            String translation = parseJSON(json);
+            result.setText(translation);
+
+            item.setResult(translation);
+            item.insert();
+            setHistoryAdapter();
+        }
+
+        private String parseJSON(String s){
             try {
                 JSONObject jsonObject = new JSONObject(s);
-                String translate = jsonObject.getString("result");
-                result.setText(translate);
+                return jsonObject.getString("result");
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-
-            Languages langSource = (Languages) spinnerLangFrom.getSelectedItem();
-            Languages langResult = (Languages) spinnerLangTo.getSelectedItem();
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
-            HistoryItem item = new HistoryItem(User.user.getId(), langSource.name(),
-                    langResult.name(), source.getText().toString().trim(),
-                    result.getText().toString().trim(), dateFormat.format(date));
-
-            item.insert();
-
-            setHistoryAdapter();
         }
     }
 }

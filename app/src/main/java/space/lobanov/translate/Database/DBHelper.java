@@ -1,12 +1,13 @@
-package space.lobanov.translate;
+package space.lobanov.translate.Database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+
 public class DBHelper extends SQLiteOpenHelper {
-    static DBHelper database;
+    public static DBHelper database;
     public static final int DATABASE_VERSION = 11;
     public static final String DATABASE_NAME = "translate";
 

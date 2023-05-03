@@ -5,12 +5,13 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fl_home"
-    tools:context="HomeFragment">
+    tools:context=".Fragments.HomeFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/truffle_black"
         android:orientation="horizontal"
         tools:ignore="MissingConstraints">
 
@@ -28,7 +29,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center|center_horizontal"
             android:layout_weight="1"
-            android:background="#2D2D2D"
+            android:background="@drawable/primary_button_selector"
             android:src="@drawable/baseline_swap_horiz_24" />
 
         <Spinner
@@ -36,7 +37,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:background="#2D2D2D"
+            android:background="@color/truffle_black"
             android:textAlignment="center" />
     </LinearLayout>
 
@@ -78,6 +79,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="7dp"
             android:layout_weight="9"
             android:orientation="horizontal">
 
@@ -85,7 +88,7 @@
                 android:id="@+id/btnReset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/secondary_button_selector"
                 android:src="@drawable/baseline_close_24" />
         </LinearLayout>
     </LinearLayout>
@@ -94,14 +97,14 @@
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="#2D2D2D"
+        android:background="@color/truffle_black"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
         <ImageButton
             android:id="@+id/btnTranslate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#2D2D2D"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/primary_button_selector"
             android:src="@drawable/baseline_keyboard_arrow_down_32"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -135,14 +138,16 @@
         android:id="@+id/constraintLayout3"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="#2D2D2D"
+        android:background="@color/truffle_black"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         tools:layout_editor_absoluteX="-16dp">
 
         <ImageButton
             android:id="@+id/btnCopy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/primary_button_selector"
             android:src="@drawable/baseline_content_copy_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
