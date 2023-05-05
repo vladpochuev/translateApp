@@ -18,6 +18,7 @@
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
             android:name=".MainActivity"
             android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="stateHidden"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +29,7 @@
         <activity
             android:name=".Translate"
             android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="stateHidden"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />

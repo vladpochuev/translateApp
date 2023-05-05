@@ -5,9 +5,12 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -40,7 +43,7 @@ import space.lobanov.translate.R;
 import space.lobanov.translate.Translate;
 import space.lobanov.translate.User;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements TextView.OnEditorActionListener {
 
     private Translate mActivity;
 
@@ -96,14 +99,16 @@ public class HomeFragment extends Fragment {
             spinnerLangTo.setSelection(langAdapter.getPosition(leftSpinner));
         });
 
-        btnTranslate.setOnClickListener(l -> {
-            if (!source.getText().toString().trim().equals("")) {
-                String text = source.getText().toString().trim();
-                new GetTranslation().execute(text);
-            } else {
-                Toast.makeText(mActivity, "Введите текст", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnTranslate.setOnClickListener(l -> getTranslation());
+    }
+
+    private void getTranslation(){
+        if (!source.getText().toString().trim().equals("")) {
+            String text = source.getText().toString().trim();
+            new Translator().execute(text);
+        } else {
+            Toast.makeText(mActivity, "Введите текст", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -118,6 +123,10 @@ public class HomeFragment extends Fragment {
 
         spinnerLangFrom = mActivity.findViewById(R.id.langFrom);
         spinnerLangTo = mActivity.findViewById(R.id.langTo);
+
+        source.setHorizontallyScrolling(false);
+        source.setMaxLines(6);
+        source.setOnEditorActionListener(this);
     }
 
     private void setAdapters(){
@@ -156,7 +165,7 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private class GetTranslation extends AsyncTask<String, String, String> {
+    private class Translator extends AsyncTask<String, String, String> {
         TranslationInfo item;
         @Override
         protected String doInBackground(String... strings) {
@@ -170,7 +179,7 @@ public class HomeFragment extends Fragment {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-            return new TranslationInfo(User.user.getId(), langFrom.getCode(), langTo.getCode(),
+            return new TranslationInfo(User.user.getId(), langFrom, langTo,
                     text, dateFormat.format(date));
         }
 
@@ -192,7 +201,8 @@ public class HomeFragment extends Fragment {
             RequestBody body = RequestBody.create(mediaType,
                     String.format("{\"translateMode\":\"html\",\"platform\":\"api\"," +
                             "\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}",
-                            item.getResultLang(), item.getSourceLang(), item.getSource()));
+                            item.getResultLang().getCode(),
+                            item.getSourceLang().getCode(), item.getSource()));
             return new Request.Builder()
                     .url("https://api-b2b.backenster.com/b1/api/v3/translate")
                     .post(body)
@@ -222,5 +232,15 @@ public class HomeFragment extends Fragment {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        if (i == EditorInfo.IME_ACTION_SEARCH) {
+            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(), 0);
+            getTranslation();
+        }
+        return true;
     }
 }

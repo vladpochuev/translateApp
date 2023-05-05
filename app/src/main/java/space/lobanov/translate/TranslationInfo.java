@@ -12,13 +12,13 @@ import space.lobanov.translate.Database.HistoryTable;
 
 public class TranslationInfo {
     private long id;
-    private String sourceLang;
-    private String resultLang;
+    private Languages sourceLang;
+    private Languages resultLang;
     private String source;
     private String result;
     private String date;
 
-    public TranslationInfo(long id, String sourceLang, String resultLang, String source, String result, String date) {
+    public TranslationInfo(long id, Languages sourceLang, Languages resultLang, String source, String result, String date) {
         this.id = id;
         this.sourceLang = sourceLang;
         this.resultLang = resultLang;
@@ -27,7 +27,7 @@ public class TranslationInfo {
         this.date = date;
     }
 
-    public TranslationInfo(long id, String sourceLang, String resultLang, String source, String date) {
+    public TranslationInfo(long id, Languages sourceLang, Languages resultLang, String source, String date) {
         this.id = id;
         this.sourceLang = sourceLang;
         this.resultLang = resultLang;
@@ -41,8 +41,8 @@ public class TranslationInfo {
         ContentValues values = new ContentValues();
 
         values.put(table.USER_ID, id);
-        values.put(table.SOURCE_LANG, sourceLang);
-        values.put(table.RESULT_LANG, resultLang);
+        values.put(table.SOURCE_LANG, sourceLang.name());
+        values.put(table.RESULT_LANG, resultLang.name());
         values.put(table.SOURCE, source);
         values.put(table.RESULT, result);
         values.put(table.DATE, date);
@@ -65,7 +65,7 @@ public class TranslationInfo {
             @SuppressLint("Range") String result = cursor.getString(cursor.getColumnIndex(table.RESULT));
             @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex(table.DATE));
 
-            TranslationInfo item = new TranslationInfo(userId, sourceLang, resultLang, source, result, date);
+            TranslationInfo item = new TranslationInfo(userId, Languages.valueOf(sourceLang), Languages.valueOf(resultLang), source, result, date);
             elements.add(item);
         }
         return elements;
@@ -75,11 +75,11 @@ public class TranslationInfo {
         return id;
     }
 
-    public String getSourceLang() {
+    public Languages getSourceLang() {
         return sourceLang;
     }
 
-    public String getResultLang() {
+    public Languages getResultLang() {
         return resultLang;
     }
 
@@ -99,11 +99,11 @@ public class TranslationInfo {
         this.id = id;
     }
 
-    public void setSourceLang(String sourceLang) {
+    public void setSourceLang(Languages sourceLang) {
         this.sourceLang = sourceLang;
     }
 
-    public void setResultLang(String resultLang) {
+    public void setResultLang(Languages resultLang) {
         this.resultLang = resultLang;
     }
 

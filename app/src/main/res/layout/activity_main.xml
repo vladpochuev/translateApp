@@ -10,11 +10,11 @@
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="@string/login"
         android:layout_marginHorizontal="100sp"
-        android:layout_marginTop="200dp" />
+        android:layout_marginTop="200dp"
+        android:ems="10"
+        android:hint="@string/login"
+        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/password"
