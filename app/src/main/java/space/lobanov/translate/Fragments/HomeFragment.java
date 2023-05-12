@@ -5,6 +5,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -47,7 +51,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
     private Translate mActivity;
 
-    LangItemsAdapter langAdapter;
+    private LangItemsAdapter langAdapter;
     private EditText source;
     private TextView result;
     private ImageButton btnTranslate;
@@ -78,6 +82,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
         connectResources();
         setAdapters();
+        setButtonsVisibility();
 
         btnReset.setOnClickListener(l -> {
             source.setText("");
@@ -100,6 +105,16 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         });
 
         btnTranslate.setOnClickListener(l -> getTranslation());
+
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        if (i == EditorInfo.IME_ACTION_SEARCH) {
+            hideKeyboard();
+            getTranslation();
+        }
+        return true;
     }
 
     private void getTranslation(){
@@ -111,6 +126,10 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         }
     }
 
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(), 0);
+    }
 
     private void connectResources(){
         source = mActivity.findViewById(R.id.source);
@@ -127,6 +146,53 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         source.setHorizontallyScrolling(false);
         source.setMaxLines(6);
         source.setOnEditorActionListener(this);
+    }
+
+    public void setButtonsVisibility(){
+        btnReset.setVisibility(View.INVISIBLE);
+        btnCopy.setVisibility(View.INVISIBLE);
+
+        source.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                if(s.toString().trim().equals("")){
+                    btnReset.setVisibility(View.INVISIBLE);
+                } else {
+                    btnReset.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        result.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                if(s.toString().trim().equals("")){
+                    btnCopy.setVisibility(View.INVISIBLE);
+                } else {
+                    btnCopy.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     private void setAdapters(){
@@ -176,11 +242,12 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         private TranslationInfo getInfo(String text){
             Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
             Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+            LocalDateTime date = LocalDateTime.now();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
 
             return new TranslationInfo(User.user.getId(), langFrom, langTo,
-                    text, dateFormat.format(date));
+                    text, dtf.format(date));
         }
 
         private String executeRequest(){
@@ -232,15 +299,5 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    @Override
-    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-        if (i == EditorInfo.IME_ACTION_SEARCH) {
-            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(), 0);
-            getTranslation();
-        }
-        return true;
     }
 }

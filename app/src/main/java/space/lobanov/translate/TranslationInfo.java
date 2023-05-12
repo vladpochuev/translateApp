@@ -5,7 +5,13 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import space.lobanov.translate.Database.DBHelper;
 import space.lobanov.translate.Database.HistoryTable;
@@ -45,7 +51,7 @@ public class TranslationInfo {
         values.put(table.RESULT_LANG, resultLang.name());
         values.put(table.SOURCE, source);
         values.put(table.RESULT, result);
-        values.put(table.DATE, date);
+        values.put(table.DATE, parseStringIntoUNIX(date));
 
         database.insert(table.CONTACTS, null, values);
     }
@@ -63,12 +69,26 @@ public class TranslationInfo {
             @SuppressLint("Range") String resultLang = cursor.getString(cursor.getColumnIndex(table.RESULT_LANG));
             @SuppressLint("Range") String source = cursor.getString(cursor.getColumnIndex(table.SOURCE));
             @SuppressLint("Range") String result = cursor.getString(cursor.getColumnIndex(table.RESULT));
-            @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex(table.DATE));
+            @SuppressLint("Range") long date = cursor.getLong(cursor.getColumnIndex(table.DATE));
 
-            TranslationInfo item = new TranslationInfo(userId, Languages.valueOf(sourceLang), Languages.valueOf(resultLang), source, result, date);
+            TranslationInfo item = new TranslationInfo(userId, Languages.valueOf(sourceLang), Languages.valueOf(resultLang), source, result, getStringFromUNIX(date));
             elements.add(item);
         }
         return elements;
+    }
+
+    private static long parseStringIntoUNIX(String string){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
+        LocalDateTime localDateTime = LocalDateTime.parse(string, dtf);
+        Instant instant = Instant.parse(localDateTime + ".00Z");
+        return instant.toEpochMilli();
+    }
+
+    private static String getStringFromUNIX(long unix){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        Instant instant = Instant.ofEpochSecond(unix/1000);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return dtf.format(localDateTime);
     }
 
     public long getId() {

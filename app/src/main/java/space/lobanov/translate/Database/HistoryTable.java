@@ -21,12 +21,12 @@ public class HistoryTable {
 
     enum Queries {
         CREATE("CREATE TABLE IF NOT EXISTS " +
-                "%s(%s INTEGER, " + // TABLE_CONTACTS, USER_ID
+                "%s(%s INTEGER(8), " + // TABLE_CONTACTS, USER_ID
                 "%s VARCHAR(32), " +  //  SOURCE_LANG
                 "%s VARCHAR(32), " + // RESULT_LANG
                 "%s VARCHAR(256), " + // SOURCE
                 "%s VARCHAR(256), " + // RESULT
-                "%s VARCHAR(40) );"), // DATE
+                "%s INTEGER(8) );"), // DATE
         UPDATE("DROP TABLE IF EXISTS %s"); // TABLE_CONTACTS
         final String QUERY;
         Queries(String QUERY) {
