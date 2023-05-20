@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "422826775380",
+    "firebase_url": "https://luxus-translate-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "luxus-translate",
+    "storage_bucket": "luxus-translate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422826775380:android:143b84f3336c7e5eceaec1",
+        "android_client_info": {
+          "package_name": "space.lobanov.translate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "422826775380-lnt8quam03qak60165eoigosph451mmt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA7tx_5P1Fq7ywEWTPCs3jwn30mVUOFBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "422826775380-lnt8quam03qak60165eoigosph451mmt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
