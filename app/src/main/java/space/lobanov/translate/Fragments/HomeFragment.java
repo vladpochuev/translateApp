@@ -24,14 +24,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import okhttp3.MediaType;
@@ -40,12 +41,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import space.lobanov.translate.Adapters.LangItemsAdapter;
-import space.lobanov.translate.TranslationInfo;
 import space.lobanov.translate.Adapters.HistoryItemsAdapter;
+import space.lobanov.translate.History;
 import space.lobanov.translate.Languages;
 import space.lobanov.translate.R;
 import space.lobanov.translate.Translate;
-import space.lobanov.translate.User;
 
 public class HomeFragment extends Fragment implements TextView.OnEditorActionListener {
 
@@ -214,7 +214,10 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
     }
 
     private void setHistoryAdapter(){
-        HistoryItemsAdapter historyItemsAdapter = new HistoryItemsAdapter(mActivity, TranslationInfo.getElements());
+        ArrayList<History> list = History.getElements();
+        list.add(new History("test", Languages.English, Languages.English, "test", 1000));
+        HistoryItemsAdapter historyItemsAdapter = new HistoryItemsAdapter(mActivity, list);
+        System.out.println(list);
         historyList.setAdapter(historyItemsAdapter);
     }
 
@@ -232,22 +235,24 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
 
     private class Translator extends AsyncTask<String, String, String> {
-        TranslationInfo item;
+        History item;
         @Override
         protected String doInBackground(String... strings) {
             item = getInfo(strings[0]);
             return executeRequest();
         }
 
-        private TranslationInfo getInfo(String text){
+        private History getInfo(String text){
             Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
             Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
 
-            LocalDateTime date = LocalDateTime.now();
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
+            return new History(text, langTo, langFrom, FirebaseAuth.getInstance().getUid(), getUNIX());
+        }
 
-            return new TranslationInfo(User.user.getId(), langFrom, langTo,
-                    text, dtf.format(date));
+        private long getUNIX(){
+            LocalDateTime localDateTime = LocalDateTime.now();
+            Instant instant = Instant.parse(localDateTime + "Z");
+            return instant.toEpochMilli();
         }
 
         private String executeRequest(){
@@ -268,8 +273,8 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
             RequestBody body = RequestBody.create(mediaType,
                     String.format("{\"translateMode\":\"html\",\"platform\":\"api\"," +
                             "\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}",
-                            item.getResultLang().getCode(),
-                            item.getSourceLang().getCode(), item.getSource()));
+                            item.getLangTo().getCode(),
+                            item.getLangFrom().getCode(), item.getSource()));
             return new Request.Builder()
                     .url("https://api-b2b.backenster.com/b1/api/v3/translate")
                     .post(body)
