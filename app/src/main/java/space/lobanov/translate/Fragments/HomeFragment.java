@@ -3,6 +3,7 @@ package space.lobanov.translate.Fragments;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -23,8 +25,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +53,7 @@ import space.lobanov.translate.Adapters.LangItemsAdapter;
 import space.lobanov.translate.Adapters.HistoryItemsAdapter;
 import space.lobanov.translate.History;
 import space.lobanov.translate.Languages;
+import space.lobanov.translate.MainActivity;
 import space.lobanov.translate.R;
 import space.lobanov.translate.Translate;
 
@@ -60,10 +70,9 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
     private ImageButton btnSwap;
     private Spinner spinnerLangFrom;
     private Spinner spinnerLangTo;
-    private ListView historyList;
-    private HomeFragment(){
-
-    }
+    private RecyclerView historyList;
+    private HistoryItemsAdapter historyAdapter;
+    private HomeFragment(){}
 
     public static HomeFragment newInstance(){
         return new HomeFragment();
@@ -106,6 +115,42 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
         btnTranslate.setOnClickListener(l -> getTranslation());
 
+        Button button = mActivity.findViewById(R.id.button);
+        button.setOnClickListener(l -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(mActivity, MainActivity.class);
+            startActivity(intent);
+            mActivity.finish();
+        });
+
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int itemCount = historyAdapter.getItemCount();
+                if (itemCount > 0) {
+                    // Прокручиваем RecyclerView к последней позиции
+                    historyList.scrollToPosition(itemCount - 1);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        FirebaseDatabase.getInstance().getReference().addValueEventListener(listener);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        historyAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        historyAdapter.stopListening();
     }
 
     @Override
@@ -139,6 +184,10 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         btnCopy = mActivity.findViewById(R.id.btnCopy);
         btnSwap = mActivity.findViewById(R.id.btnSwap);
         historyList = mActivity.findViewById(R.id.historyList);
+        LinearLayoutManager manager = new LinearLayoutManager(mActivity);
+        manager.setReverseLayout(true);
+        manager.setStackFromEnd(true);
+        historyList.setLayoutManager(manager);
 
         spinnerLangFrom = mActivity.findViewById(R.id.langFrom);
         spinnerLangTo = mActivity.findViewById(R.id.langTo);
@@ -214,11 +263,9 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
     }
 
     private void setHistoryAdapter(){
-        ArrayList<History> list = History.getElements();
-        list.add(new History("test", Languages.English, Languages.English, "test", 1000));
-        HistoryItemsAdapter historyItemsAdapter = new HistoryItemsAdapter(mActivity, list);
-        System.out.println(list);
-        historyList.setAdapter(historyItemsAdapter);
+        FirebaseRecyclerOptions<History> elements = History.getElements();
+        historyAdapter = new HistoryItemsAdapter(elements);
+        historyList.setAdapter(historyAdapter);
     }
 
     private Languages getLocale() {
@@ -293,7 +340,6 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
             item.setResult(translation);
             item.insert();
-            setHistoryAdapter();
         }
 
         private String parseJSON(String s){

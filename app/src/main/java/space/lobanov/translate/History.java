@@ -2,6 +2,7 @@ package space.lobanov.translate;
 
 import androidx.annotation.NonNull;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,8 +25,7 @@ public class History {
     private static final String HISTORY_KEY = "History";
     private static final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(HISTORY_KEY);
 
-    public History() {
-    }
+    public History() {}
     public History(String source, Languages langTo, Languages langFrom, String UID, long date) {
         this.source = source;
         this.langTo = langTo;
@@ -38,24 +38,10 @@ public class History {
         mDatabase.push().setValue(this);
     }
 
-    public static ArrayList<History> getElements() {
-        ArrayList<History> elements = new ArrayList<>();
+    public static FirebaseRecyclerOptions<History> getElements(){
         Query query = mDatabase.orderByChild("uid").equalTo(FirebaseAuth.getInstance().getUid());
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot children : snapshot.getChildren()){
-                    History history = children.getValue(History.class);
-                    System.out.println(history);
-                    elements.add(history);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        FirebaseRecyclerOptions<History> elements = new FirebaseRecyclerOptions.Builder<History>()
+                .setQuery(query, History.class).build();
         return elements;
     }
 
@@ -105,12 +91,5 @@ public class History {
 
     public void setDate(long date) {
         this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "History{" +
-                "source='" + source + '\'' +
-                '}';
     }
 }

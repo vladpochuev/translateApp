@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -20,36 +24,24 @@ import java.util.List;
 import space.lobanov.translate.History;
 import space.lobanov.translate.R;
 
-public class HistoryItemsAdapter extends ArrayAdapter<History> {
+public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<History,HistoryItemsAdapter.MyViewHolder> {
+    public HistoryItemsAdapter(@NonNull FirebaseRecyclerOptions<History> options) {
+        super(options);
+    }
 
-    private Context context;
-    private List<History> items;
-
-    public HistoryItemsAdapter(Context context, ArrayList<History> items) {
-        super(context, R.layout.item, items);
-        this.context = context;
-        this.items = items;
+    @Override
+    protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull History model) {
+        holder.languages.setText(model.getLangFrom() + " ➞ "+ model.getLangTo());
+        holder.date.setText(getStringFromUNIX(model.getDate()));
+        holder.source.setText(model.getSource());
+        holder.result.setText(model.getResult());
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.item, parent, false);
-
-        History item = items.get(position);
-
-        TextView languages = view.findViewById(R.id.itemLang);
-        TextView date = view.findViewById(R.id.itemDate);
-        TextView source = view.findViewById(R.id.itemSource);
-        TextView result = view.findViewById(R.id.itemResult);
-
-        languages.setText(item.getLangFrom() + " ➞ "+ item.getLangTo());
-        date.setText(getStringFromUNIX(item.getDate()));
-        source.setText(item.getSource());
-        result.setText(item.getResult());
-
-        return view;
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+        return new MyViewHolder(view);
     }
 
     private static String getStringFromUNIX(long unix){
@@ -57,5 +49,20 @@ public class HistoryItemsAdapter extends ArrayAdapter<History> {
         Instant instant = Instant.ofEpochSecond(unix/1000);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         return dtf.format(localDateTime);
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder{
+        TextView languages;
+        TextView date;
+        TextView source;
+        TextView result;
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            languages = itemView.findViewById(R.id.itemLang);
+            date = itemView.findViewById(R.id.itemDate);
+            source = itemView.findViewById(R.id.itemSource);
+            result = itemView.findViewById(R.id.itemResult);
+        }
+
     }
 }
