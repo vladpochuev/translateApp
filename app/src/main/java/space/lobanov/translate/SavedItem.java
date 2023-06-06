@@ -1,47 +1,39 @@
 package space.lobanov.translate;
 
-import androidx.annotation.NonNull;
-
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-
-public class History {
+public class SavedItem implements Insertable {
     private String source;
     private String result;
     private Languages langTo;
     private Languages langFrom;
     private String UID;
-    private long date;
+    private static final String KEY = "SavedItem";
+    private static final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(KEY);
 
-    private static final String HISTORY_KEY = "History";
-    private static final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(HISTORY_KEY);
+    public SavedItem() {}
 
-    public History() {}
-    public History(String source, Languages langTo, Languages langFrom, String UID, long date) {
+    public SavedItem(String source, String result, Languages langTo, Languages langFrom, String UID) {
         this.source = source;
+        this.result = result;
         this.langTo = langTo;
         this.langFrom = langFrom;
         this.UID = UID;
-        this.date = date;
     }
 
-    public void insert(){
+    @Override
+    public void insert() {
         mDatabase.push().setValue(this);
     }
 
-    public static FirebaseRecyclerOptions<History> getElements(){
+    public static FirebaseRecyclerOptions<SavedItem> getElements(){
         Query query = mDatabase.orderByChild("uid").equalTo(FirebaseAuth.getInstance().getUid());
-        FirebaseRecyclerOptions<History> elements = new FirebaseRecyclerOptions.Builder<History>()
-                .setQuery(query, History.class).build();
+        FirebaseRecyclerOptions<SavedItem> elements = new FirebaseRecyclerOptions.Builder<SavedItem>()
+                .setQuery(query, SavedItem.class).build();
         return elements;
     }
 
@@ -83,13 +75,5 @@ public class History {
 
     public void setUID(String UID) {
         this.UID = UID;
-    }
-
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
     }
 }

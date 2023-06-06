@@ -1,14 +1,11 @@
 package space.lobanov.translate.Adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -18,19 +15,17 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
-import space.lobanov.translate.History;
+import space.lobanov.translate.HistoryItem;
 import space.lobanov.translate.R;
 
-public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<History,HistoryItemsAdapter.MyViewHolder> {
-    public HistoryItemsAdapter(@NonNull FirebaseRecyclerOptions<History> options) {
+public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<HistoryItem,HistoryItemsAdapter.MyViewHolder> {
+    public HistoryItemsAdapter(@NonNull FirebaseRecyclerOptions<HistoryItem> options) {
         super(options);
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull History model) {
+    protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull HistoryItem model) {
         holder.languages.setText(model.getLangFrom() + " ➞ "+ model.getLangTo());
         holder.date.setText(getStringFromUNIX(model.getDate()));
         holder.source.setText(model.getSource());
@@ -40,7 +35,7 @@ public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<History,History
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_item, parent, false);
         return new MyViewHolder(view);
     }
 
