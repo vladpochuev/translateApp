@@ -3,13 +3,18 @@ package space.lobanov.translate;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
+
+import space.lobanov.translate.Fragments.ListFragment;
 
 public class SavedItemsAdapter extends FirebaseRecyclerAdapter<SavedItem, SavedItemsAdapter.MyViewHolder> {
 
@@ -22,6 +27,10 @@ public class SavedItemsAdapter extends FirebaseRecyclerAdapter<SavedItem, SavedI
         holder.tvLang.setText(model.getLangFrom() + " ➞ "+ model.getLangTo());
         holder.tvSource.setText(model.getSource());
         holder.tvResult.setText(model.getResult());
+        holder.bDelete.setOnClickListener(l -> {
+            DatabaseReference itemRef = getRef(position);
+            itemRef.removeValue();
+        });
 
     }
 
@@ -34,12 +43,14 @@ public class SavedItemsAdapter extends FirebaseRecyclerAdapter<SavedItem, SavedI
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvLang, tvSource, tvResult;
+        ImageButton bDelete;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             tvLang = itemView.findViewById(R.id.tvLang);
             tvSource = itemView.findViewById(R.id.tvSource);
             tvResult = itemView.findViewById(R.id.tvResult);
+            bDelete = itemView.findViewById(R.id.bDelete);
         }
     }
 }

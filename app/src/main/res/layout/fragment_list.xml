@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal" />
     </LinearLayout>
 
     <LinearLayout
@@ -41,7 +41,8 @@
         android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal">
 
     </LinearLayout>
 
@@ -54,38 +55,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout4">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imAvatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_marginStart="25dp"
+            android:background="@drawable/image_avatar_style"
+            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+            tools:src="@drawable/baseline_person_24" />
 
         <TextView
             android:id="@+id/tvEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="56dp"
             android:text="TextView"
             android:textColor="@color/pebble_gray"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imAvatar" />
 
         <ImageButton
             android:id="@+id/ibSignOut"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="28dp"
             android:background="@drawable/secondary_button_selector"
             app:layout_constraintBottom_toTopOf="@+id/tvEmail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.583"
             app:srcCompat="@drawable/baseline_exit_to_app_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

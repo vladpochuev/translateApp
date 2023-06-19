@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -125,6 +126,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         SavedItem item = new SavedItem(source.getText().toString(), result.getText().toString(),
                 langTo, langFrom, FirebaseAuth.getInstance().getUid());
         item.insert();
+        Toast.makeText(mActivity, "Перевод сохранен", Toast.LENGTH_SHORT).show();
     }
 
     private void onClickSwap() {
@@ -246,6 +248,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                result.setText("");
                 if(TextUtils.isEmpty(s)){
                     btnReset.setVisibility(View.INVISIBLE);
                 } else {
@@ -330,6 +333,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
             String translation = parseJSON(json);
             result.setText(translation);
+            hideKeyboard();
 
             item.setResult(translation);
             item.insert();
