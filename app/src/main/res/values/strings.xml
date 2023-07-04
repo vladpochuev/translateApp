@@ -1,9 +1,33 @@
 <resources>
     <string name="app_name">Translate</string>
-    <string name="login">Login</string>
-    <string name="password">Password</string>
-    <string name="button">go</string>
-    <string name="no_user_input">Введите логин и пароль</string>
-    <string name="logIn">Log In</string>
-    <string name="signUp">Sign Up</string>
+
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_sign_in">Sign In</string>
+    <string name="login_sign_up">sign up</string>
+    <string name="home_enter_the_text">Enter the text</string>
+    <string name="home_translation">Translation</string>
+
+    <string name="list_saved">Saved</string>
+    <string name="list_avatar">Avatar</string>
+    <string name="list_sign_out">Sign out</string>
+
+    <string name="quiz_confirm">confirm</string>
+    <string name="quiz_quiz">Quiz</string>
+    <string name="quiz_translate">translate</string>
+    <string name="quiz_into">into</string>
+    <string name="quiz_answer">answer</string>
+    <string name="quiz_wrong">wrong</string>
+    <string name="quiz_correct">correct</string>
+
+    <string name="saved_item_delete_item">delete item</string>
+    <string name="saved_item_textview">TextView</string>
+
+    <string name="home_swap_languages">swap languages</string>
+    <string name="home_erase_text">erase text</string>
+    <string name="home_translate">translate</string>
+    <string name="home_save_translation">Save translation</string>
+    <string name="home_copy_result">Copy result</string>
+    <string name="home_translate_from">Translate from language</string>
+    <string name="home_translate_to">Translate to language</string>
 </resources>

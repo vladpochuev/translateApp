@@ -1,10 +1,17 @@
 package space.lobanov.translate;
 
+import androidx.annotation.NonNull;
+
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class SavedItem implements Insertable {
     private String source;
@@ -30,11 +37,29 @@ public class SavedItem implements Insertable {
         mDatabase.push().setValue(this);
     }
 
-    public static FirebaseRecyclerOptions<SavedItem> getElements(){
+    public static FirebaseRecyclerOptions<SavedItem> getRecycleOptions(){
         Query query = mDatabase.orderByChild("uid").equalTo(FirebaseAuth.getInstance().getUid());
         FirebaseRecyclerOptions<SavedItem> elements = new FirebaseRecyclerOptions.Builder<SavedItem>()
                 .setQuery(query, SavedItem.class).build();
         return elements;
+    }
+
+    public static void getElements(FirebaseCallback callback) {
+        Query query = mDatabase.orderByChild("uid").equalTo(FirebaseAuth.getInstance().getUid());
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<SavedItem> elements = new ArrayList<>();
+                for (DataSnapshot children : snapshot.getChildren()){
+                    SavedItem item = children.getValue(SavedItem.class);
+                    elements.add(item);
+                }
+                callback.onDataLoaded(elements);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     public String getSource() {

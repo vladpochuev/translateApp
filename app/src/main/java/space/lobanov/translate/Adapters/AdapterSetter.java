@@ -2,7 +2,6 @@ package space.lobanov.translate.Adapters;
 
 import android.content.Context;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import java.util.Locale;
@@ -43,7 +42,7 @@ public class AdapterSetter {
     }
 
     public SavedItemsAdapter getSavedAdapter() {
-        FirebaseRecyclerOptions<SavedItem> elements = SavedItem.getElements();
+        FirebaseRecyclerOptions<SavedItem> elements = SavedItem.getRecycleOptions();
         return new SavedItemsAdapter(elements);
     }
 }

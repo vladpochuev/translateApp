@@ -10,32 +10,34 @@
     <EditText
         android:id="@+id/edEmail"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="160dp"
         android:ems="10"
-        android:hint="Email"
+        android:hint="@string/login_email"
         android:inputType="textEmailAddress"
         android:textColor="@color/white"
         android:textColorHint="@color/pebble_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:autofillHints="emailAddress" />
 
     <EditText
         android:id="@+id/edPassword"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="80dp"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/login_password"
         android:inputType="textPassword"
         android:textColor="@color/white"
         android:textColorHint="@color/pebble_gray"
         app:layout_constraintEnd_toEndOf="@+id/edEmail"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/edEmail"
-        app:layout_constraintTop_toBottomOf="@+id/edEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/edEmail"
+        android:autofillHints="password" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bSignIn"
@@ -44,7 +46,7 @@
         android:layout_marginTop="100dp"
         android:background="@drawable/primary_button_selector"
         android:onClick="onClickSignIn"
-        android:text="Sign In"
+        android:text="@string/login_sign_in"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/edPassword"
         app:layout_constraintStart_toStartOf="@+id/edPassword"
@@ -57,7 +59,7 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/primary_button_selector"
         android:onClick="onClickSignUp"
-        android:text="sign up"
+        android:text="@string/login_sign_up"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/bSignIn"
         app:layout_constraintHorizontal_bias="0.0"

@@ -47,7 +47,7 @@ public class EmailVerifier extends AppCompatActivity {
     private void testIfEmailVerified() {
         cUser.reload().addOnCompleteListener(task -> {
             if (cUser.isEmailVerified()) {
-                Toast.makeText(this, "Почта успешно подтверждена", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Account has been successfully created", Toast.LENGTH_SHORT).show();
                 mHandler.removeCallbacks(mRunnable);
                 getIntoActivity();
             }
@@ -61,9 +61,9 @@ public class EmailVerifier extends AppCompatActivity {
     private void sendEmailVer() {
         cUser.sendEmailVerification().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
-                Toast.makeText(this, "Проверьте вашу почту для подтверждения адреса", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Check your email to verify the address", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Send email failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Email failed to send", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -74,7 +74,7 @@ public class EmailVerifier extends AppCompatActivity {
         mHandler = new Handler();
     }
     private void setTextViewMessage() {
-        String message = "To complete account setup, you need to verify %s. Please check your " +
+        String message = "To complete account setup, you need to verify %s. \n Please check your " +
                 "email.";
         String email = cUser.getEmail();
         tvMessage.setText(String.format(message, email));

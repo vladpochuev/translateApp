@@ -7,13 +7,12 @@
     android:id="@+id/fl_home"
     tools:context=".Fragments.HomeFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/truffle_black"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -21,27 +20,40 @@
             android:id="@+id/langFrom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
             android:background="#2D2D2D"
-            android:textAlignment="center" />
+            android:contentDescription="@string/home_translate_from"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnSwap"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/btnSwap"
-            android:layout_width="10dp"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center|center_horizontal"
             android:layout_weight="1"
             android:background="@drawable/primary_button_selector"
-            android:src="@drawable/baseline_swap_horiz_24" />
+            android:contentDescription="@string/home_swap_languages"
+            android:src="@drawable/baseline_swap_horiz_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
             android:id="@+id/langTo"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
             android:background="@color/truffle_black"
-            android:textAlignment="center" />
-    </LinearLayout>
+            android:contentDescription="@string/home_translate_to"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnSwap"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout7"
@@ -57,10 +69,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:autofillHints=""
             android:backgroundTint="#00FFFFFF"
             android:ems="10"
             android:gravity="start"
-            android:hint="Введите текст"
+            android:hint="@string/home_enter_the_text"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:padding="20dp"
@@ -86,6 +99,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/secondary_button_selector"
+                android:contentDescription="@string/home_erase_text"
+                android:cropToPadding="true"
                 android:src="@drawable/baseline_close_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -104,14 +119,15 @@
 
         <ImageButton
             android:id="@+id/btnTranslate"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:background="@drawable/primary_button_selector"
             android:src="@drawable/baseline_keyboard_arrow_down_32"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/home_translate" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -129,8 +145,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/pitbull_black"
-            android:hint="Перевод"
+            android:hint="@string/home_translation"
             android:padding="20dp"
+            android:saveEnabled="true"
             android:textColor="#FFFFFF"
             android:textColorHint="@color/pebble_gray"
             android:textSize="18sp"
@@ -158,19 +175,21 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.4" />
+            app:layout_constraintVertical_bias="0.4"
+            android:contentDescription="@string/home_save_translation" />
 
         <ImageButton
             android:id="@+id/btnCopy"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginRight="7dp"
+            android:layout_marginEnd="7dp"
             android:background="@drawable/primary_button_selector"
             android:foregroundGravity="center_vertical"
             android:src="@drawable/baseline_content_copy_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/home_copy_result" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
