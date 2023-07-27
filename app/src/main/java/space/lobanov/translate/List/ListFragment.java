@@ -1,9 +1,8 @@
-package space.lobanov.translate.Fragments;
+package space.lobanov.translate.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -21,7 +19,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,31 +28,26 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
-import space.lobanov.translate.Adapters.AdapterSetter;
-import space.lobanov.translate.MainActivity;
+import space.lobanov.translate.AdapterSetter;
+import space.lobanov.translate.Home.HomeFragment;
+import space.lobanov.translate.Login.MainActivity;
 import space.lobanov.translate.R;
 import space.lobanov.translate.SavedItemsAdapter;
 import space.lobanov.translate.Translate;
-import space.lobanov.translate.WrapContentLinearLayoutManager;
 
 public class ListFragment extends Fragment {
     private FirebaseAuth mAuth;
 
     private Translate mActivity;
     private ImageButton ibSignOut, imAvatar;
-    private TextView tvEmail;
-    private SavedItemsAdapter adapter;
-    private RecyclerView savedList;
+    public static SavedItemsAdapter adapter;
+    public RecyclerView savedList;
     private ActivityResultLauncher<Intent> resultLauncher;
     private StorageReference mStorageRef;
     private Uri uploadUri;
 
-    private ListFragment() {
+    public ListFragment() {
 
-    }
-
-    public static ListFragment newInstance() {
-        return new ListFragment();
     }
 
     @Nullable
@@ -90,7 +82,7 @@ public class ListFragment extends Fragment {
         mActivity = (Translate) getActivity();
         ibSignOut = mActivity.findViewById(R.id.ibSignOut);
         imAvatar = mActivity.findViewById(R.id.imAvatar);
-        tvEmail = mActivity.findViewById(R.id.tvEmail);
+        TextView tvEmail = mActivity.findViewById(R.id.tvEmail);
         savedList = mActivity.findViewById(R.id.savedList);
         mAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference("ImageDB");
@@ -109,6 +101,16 @@ public class ListFragment extends Fragment {
         };
         return registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(), callback);
+    }
+
+    private void uploadImage() {
+        BitmapDrawable drawable = (BitmapDrawable) imAvatar.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] byteArray = baos.toByteArray();
+        StorageReference mRef = mStorageRef.child(mAuth.getCurrentUser().getUid());
+        mRef.putBytes(byteArray);
     }
 
     private void getImage() {
@@ -150,15 +152,5 @@ public class ListFragment extends Fragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         resultLauncher.launch(intent);
-    }
-
-    private void uploadImage() {
-        BitmapDrawable drawable = (BitmapDrawable) imAvatar.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] byteArray = baos.toByteArray();
-        StorageReference mRef = mStorageRef.child(mAuth.getCurrentUser().getUid());
-        mRef.putBytes(byteArray);
     }
 }

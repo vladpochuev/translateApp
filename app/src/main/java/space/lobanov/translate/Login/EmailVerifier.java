@@ -1,9 +1,9 @@
-package space.lobanov.translate;
+package space.lobanov.translate.Login;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,13 +13,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.concurrent.TimeUnit;
+import space.lobanov.translate.R;
+import space.lobanov.translate.Translate;
 
 public class EmailVerifier extends AppCompatActivity {
-    FirebaseAuth mAuth;
-    FirebaseUser cUser;
-    TextView tvMessage;
-    Handler mHandler;
+    private FirebaseAuth mAuth;
+    private FirebaseUser cUser;
+    private TextView tvMessage;
+    private Handler mHandler;
+
+    public static final String isVerificationCanceled = "CANCELED";
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            testIfEmailVerified();
+            mHandler.postDelayed(this, 5000);
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,17 +43,9 @@ public class EmailVerifier extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         sendEmailVer();
         mHandler.postDelayed(mRunnable, 5000);
     }
-    private Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            testIfEmailVerified();
-            mHandler.postDelayed(this, 5000);
-        }
-    };
 
     private void testIfEmailVerified() {
         cUser.reload().addOnCompleteListener(task -> {
@@ -78,5 +81,13 @@ public class EmailVerifier extends AppCompatActivity {
                 "email.";
         String email = cUser.getEmail();
         tvMessage.setText(String.format(message, email));
+    }
+
+    public void onClickCancel(View view) {
+        Intent intent = new Intent(EmailVerifier.this, MainActivity.class);
+        intent.putExtra(isVerificationCanceled, true);
+        mHandler.removeCallbacks(mRunnable);
+        startActivity(intent);
+        finish();
     }
 }

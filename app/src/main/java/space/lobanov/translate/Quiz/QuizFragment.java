@@ -1,6 +1,5 @@
-package space.lobanov.translate.Fragments;
+package space.lobanov.translate.Quiz;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +10,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
-import space.lobanov.translate.AnswersHolder;
-import space.lobanov.translate.LanguageCollector;
 import space.lobanov.translate.Languages;
+import space.lobanov.translate.Quiz.AnswersHolder;
+import space.lobanov.translate.Quiz.LanguageCollector;
 import space.lobanov.translate.R;
 import space.lobanov.translate.SavedItem;
 import space.lobanov.translate.Translate;
@@ -33,12 +33,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private ArrayList<Button> buttons;
     private String correctAnswer;
     private String selectedAnswer;
+    private ConstraintLayout alert;
 
-    private QuizFragment(){}
-
-    public static QuizFragment newInstance(){
-        return new QuizFragment();
-    }
+    public QuizFragment(){}
 
     @Nullable
     @Override
@@ -64,6 +61,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         btnAnswer4 = mActivity.findViewById(R.id.btnAnswer4);
         btnConfirm = mActivity.findViewById(R.id.btnConfirm);
         btnCorrect = mActivity.findViewById(R.id.btnCorrect);
+        alert = mActivity.findViewById(R.id.alert);
         btnWrong = mActivity.findViewById(R.id.btnWrong);
         allItems = new ArrayList<>();
     }
@@ -83,29 +81,30 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         btnWrong.setOnClickListener(l -> getNextQuestion());
     }
 
-    private void setButtonsVisibility() {
+    private void setVisibility() {
         btnCorrect.setVisibility(View.INVISIBLE);
         btnWrong.setVisibility(View.INVISIBLE);
+        alert.setVisibility(View.INVISIBLE);
     }
     private void loadQuestion() {
         SavedItem.getElements(items -> {
             allItems = items;
-            getTargetLanguage();
-            isLanguageEnabled();
-            getAnswers();
-            setData();
-            setButtonsVisibility();
+            if(getTargetLanguage()) {
+                getAnswers();
+                setData();
+                setVisibility();
+            }
         });
     }
 
-    private void getTargetLanguage() {
+    private boolean getTargetLanguage() {
         LanguageCollector collector = new LanguageCollector(allItems);
-        targetLanguage = collector.pickLanguage();
-    }
-
-    private void isLanguageEnabled() {
-        if(targetLanguage == null) {
-
+        if(collector.isLanguageEnabled()) {
+            targetLanguage = collector.pickLanguage();
+            return true;
+        } else {
+            alert.setVisibility(View.VISIBLE);
+            return false;
         }
     }
 

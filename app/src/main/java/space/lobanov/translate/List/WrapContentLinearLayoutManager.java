@@ -1,4 +1,4 @@
-package space.lobanov.translate;
+package space.lobanov.translate.List;
 
 import android.content.Context;
 import android.util.Log;

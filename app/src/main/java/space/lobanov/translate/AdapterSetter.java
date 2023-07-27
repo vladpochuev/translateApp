@@ -1,4 +1,4 @@
-package space.lobanov.translate.Adapters;
+package space.lobanov.translate;
 
 import android.content.Context;
 
@@ -6,14 +6,12 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import java.util.Locale;
 
-import space.lobanov.translate.HistoryItem;
-import space.lobanov.translate.Languages;
-import space.lobanov.translate.R;
-import space.lobanov.translate.SavedItem;
-import space.lobanov.translate.SavedItemsAdapter;
+import space.lobanov.translate.Home.HistoryItem;
+import space.lobanov.translate.Home.HistoryItemsAdapter;
+import space.lobanov.translate.Home.LangItemsAdapter;
 
 public class AdapterSetter {
-    private Context context;
+    private final Context context;
 
     public AdapterSetter(Context context) {
         this.context = context;

@@ -1,4 +1,4 @@
-package space.lobanov.translate.Adapters;
+package space.lobanov.translate.Home;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import space.lobanov.translate.HistoryItem;
 import space.lobanov.translate.R;
 
 public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<HistoryItem,HistoryItemsAdapter.MyViewHolder> {
@@ -26,7 +25,8 @@ public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<HistoryItem,His
 
     @Override
     protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull HistoryItem model) {
-        holder.languages.setText(model.getLangFrom() + " ➞ "+ model.getLangTo());
+        String message = model.getLangFrom() + " ➞ "+ model.getLangTo();
+        holder.languages.setText(message);
         holder.date.setText(getStringFromUNIX(model.getDate()));
         holder.source.setText(model.getSource());
         holder.result.setText(model.getResult());
@@ -46,7 +46,7 @@ public class HistoryItemsAdapter extends FirebaseRecyclerAdapter<HistoryItem,His
         return dtf.format(localDateTime);
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder{
+    static class MyViewHolder extends RecyclerView.ViewHolder{
         TextView languages;
         TextView date;
         TextView source;

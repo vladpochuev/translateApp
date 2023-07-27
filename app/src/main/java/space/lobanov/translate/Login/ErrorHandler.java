@@ -1,11 +1,11 @@
-package space.lobanov.translate;
+package space.lobanov.translate.Login;
 
 import android.content.Context;
 import android.widget.Toast;
 
 public class ErrorHandler {
-    private String errorCode;
-    private Context context;
+    private final String errorCode;
+    private final Context context;
 
     public ErrorHandler(Context context, String errorCode) {
         this.context = context;
@@ -66,7 +66,7 @@ public class ErrorHandler {
                 break;
 
             case "ERROR_USER_NOT_FOUND":
-                Toast.makeText(context, "There is no user record corresponding to this identifier. The user may have been deleted.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "There is no user record corresponding to this identifier.", Toast.LENGTH_LONG).show();
                 break;
 
             case "ERROR_OPERATION_NOT_ALLOWED":
@@ -77,13 +77,5 @@ public class ErrorHandler {
                 Toast.makeText(context, "The given password is invalid1.", Toast.LENGTH_LONG).show();
                 break;
         }
-    }
-
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
     }
 }

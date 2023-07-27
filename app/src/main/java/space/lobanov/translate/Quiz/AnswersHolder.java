@@ -1,11 +1,14 @@
-package space.lobanov.translate;
+package space.lobanov.translate.Quiz;
 
 import java.util.ArrayList;
 
+import space.lobanov.translate.Languages;
+import space.lobanov.translate.SavedItem;
+
 public class AnswersHolder {
     public static final int NUMBER_OF_ANSWERS = 4;
-    private ArrayList<SavedItem> items;
-    private Languages language;
+    private final ArrayList<SavedItem> items;
+    private final Languages language;
 
     public AnswersHolder(ArrayList<SavedItem> allItems, Languages language) {
         this.items = allItems;

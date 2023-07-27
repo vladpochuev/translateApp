@@ -1,13 +1,14 @@
-package space.lobanov.translate;
-
-import android.util.Log;
+package space.lobanov.translate.Quiz;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import space.lobanov.translate.Languages;
+import space.lobanov.translate.SavedItem;
+
 public class LanguageCollector {
-    private ArrayList<Languages> enabledLanguages;
+    private final ArrayList<Languages> enabledLanguages;
 
     private static final int MIN_NUMBER_OF_ITEMS = 10;
 
@@ -29,6 +30,11 @@ public class LanguageCollector {
         }
         return enabledLanguages;
     }
+
+    public boolean isLanguageEnabled() {
+        return enabledLanguages.size() != 0;
+    }
+
     public Languages pickLanguage() {
         double ran =  Math.random();
         int randomIndex = (int) (ran * (enabledLanguages.size() - 1));

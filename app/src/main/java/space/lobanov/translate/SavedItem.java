@@ -20,7 +20,7 @@ public class SavedItem implements Insertable {
     private Languages langFrom;
     private String UID;
     private static final String KEY = "SavedItem";
-    private static final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(KEY);
+    public static final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(KEY);
 
     public SavedItem() {}
 
@@ -39,9 +39,8 @@ public class SavedItem implements Insertable {
 
     public static FirebaseRecyclerOptions<SavedItem> getRecycleOptions(){
         Query query = mDatabase.orderByChild("uid").equalTo(FirebaseAuth.getInstance().getUid());
-        FirebaseRecyclerOptions<SavedItem> elements = new FirebaseRecyclerOptions.Builder<SavedItem>()
+        return new FirebaseRecyclerOptions.Builder<SavedItem>()
                 .setQuery(query, SavedItem.class).build();
-        return elements;
     }
 
     public static void getElements(FirebaseCallback callback) {

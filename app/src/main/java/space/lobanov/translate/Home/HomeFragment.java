@@ -1,13 +1,17 @@
-package space.lobanov.translate.Fragments;
+package space.lobanov.translate.Home;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,11 +48,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import space.lobanov.translate.Adapters.AdapterSetter;
-import space.lobanov.translate.Adapters.LangItemsAdapter;
-import space.lobanov.translate.Adapters.HistoryItemsAdapter;
-import space.lobanov.translate.HistoryItem;
+import space.lobanov.translate.AdapterSetter;
 import space.lobanov.translate.Languages;
+import space.lobanov.translate.NetworkReceiver;
 import space.lobanov.translate.R;
 import space.lobanov.translate.SavedItem;
 import space.lobanov.translate.Translate;
@@ -66,11 +68,8 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
     private HistoryItemsAdapter historyAdapter;
     private AdapterSetter adapterSetter;
     private String resultText;
-    private HomeFragment(){}
-
-    public static HomeFragment newInstance(){
-        return new HomeFragment();
-    }
+    private boolean isSaved;
+    public HomeFragment(){}
 
     @Nullable
     @Override
@@ -78,22 +77,33 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onStart() {
         super.onStart();
+        historyList.getRecycledViewPool().clear();
+        historyAdapter.notifyDataSetChanged();
         historyAdapter.startListening();
-        setResultText();
+        setDefinedFields();
     }
 
-    private void setResultText() {
+    private void setDefinedFields() {
         if(resultText != null) {
             result.setText(resultText);
+        }
+        if(isSaved) {
+            btnSave.setImageResource(R.drawable.baseline_bookmark_24);
+            btnSave.setEnabled(false);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        getDefinedFields();
+    }
+
+    private void getDefinedFields() {
         resultText = result.getText().toString();
     }
 
@@ -111,53 +121,6 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         setButtonsActions();
     }
 
-    private void setButtonsActions() {
-        btnReset.setOnClickListener(l -> onClickReset());
-        btnCopy.setOnClickListener(l -> onClickCopy());
-        btnSave.setOnClickListener(l -> onClickSave());
-        btnSwap.setOnClickListener(l -> onClickSwap());
-        btnTranslate.setOnClickListener(l -> getTranslation());
-    }
-
-    private void onClickReset() {
-        source.setText("");
-        result.setText("");
-    }
-
-    private void onClickCopy() {
-        ClipboardManager clipboard = (ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("text", result.getText());
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(mActivity.getApplicationContext(), "Текст скопирован в буфер обмена", Toast.LENGTH_SHORT).show();
-    }
-
-    private void onClickSave() {
-        Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
-        Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
-        SavedItem item = new SavedItem(source.getText().toString(), result.getText().toString(),
-                langTo, langFrom, FirebaseAuth.getInstance().getUid());
-        item.insert();
-        btnSave.setImageResource(R.drawable.baseline_bookmark_24);
-        btnSave.setEnabled(false);
-    }
-
-    private void onClickSwap() {
-        Languages leftSpinner = (Languages) spinnerLangFrom.getSelectedItem();
-        Languages rightSpinner = (Languages) spinnerLangTo.getSelectedItem();
-
-        spinnerLangFrom.setSelection(langAdapter.getPosition(rightSpinner));
-        spinnerLangTo.setSelection(langAdapter.getPosition(leftSpinner));
-    }
-
-    private void getTranslation(){
-        if (!source.getText().toString().trim().equals("")) {
-            String text = source.getText().toString().trim();
-            new Translator().execute(text);
-        } else {
-            Toast.makeText(mActivity, "Введите текст", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void init(){
         plugInResources();
         setHistoryLayoutManager();
@@ -165,6 +128,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         getAdapters();
         setHistoryItemsScrolling();
         setSourceSettings();
+        registerNetworkReceiver();
     }
 
     private void plugInResources() {
@@ -237,6 +201,54 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         historyList.setAdapter(historyAdapter);
     }
 
+    private void setButtonsActions() {
+        btnReset.setOnClickListener(l -> onClickReset());
+        btnCopy.setOnClickListener(l -> onClickCopy());
+        btnSave.setOnClickListener(l -> onClickSave());
+        btnSwap.setOnClickListener(l -> onClickSwap());
+        btnTranslate.setOnClickListener(l -> getTranslation());
+    }
+
+    private void onClickReset() {
+        source.setText("");
+        result.setText("");
+    }
+
+    private void onClickCopy() {
+        ClipboardManager clipboard = (ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("text", result.getText());
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(mActivity.getApplicationContext(), "Текст скопирован в буфер обмена", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onClickSave() {
+        Languages langFrom = (Languages) spinnerLangFrom.getSelectedItem();
+        Languages langTo = (Languages) spinnerLangTo.getSelectedItem();
+        SavedItem item = new SavedItem(source.getText().toString(), result.getText().toString(),
+                langTo, langFrom, FirebaseAuth.getInstance().getUid());
+        item.insert();
+        btnSave.setImageResource(R.drawable.baseline_bookmark_24);
+        btnSave.setEnabled(false);
+        isSaved = true;
+    }
+
+    private void onClickSwap() {
+        Languages leftSpinner = (Languages) spinnerLangFrom.getSelectedItem();
+        Languages rightSpinner = (Languages) spinnerLangTo.getSelectedItem();
+
+        spinnerLangFrom.setSelection(langAdapter.getPosition(rightSpinner));
+        spinnerLangTo.setSelection(langAdapter.getPosition(leftSpinner));
+    }
+
+    private void getTranslation(){
+        if (!source.getText().toString().trim().equals("")) {
+            String text = source.getText().toString().trim();
+            new Translator().execute(text);
+        } else {
+            Toast.makeText(mActivity, "Введите текст", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_SEARCH) {
@@ -244,6 +256,10 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
             getTranslation();
         }
         return true;
+    }
+
+    public void registerNetworkReceiver() {
+        mActivity.registerReceiver(new NetworkReceiver(mActivity), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void hideKeyboard(){
@@ -327,25 +343,32 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
 
         private Request buildRequest(){
             MediaType mediaType = MediaType.parse("application/json");
+
             RequestBody body = RequestBody.create(mediaType,
                     String.format("{\"translateMode\":\"html\",\"platform\":\"api\"," +
-                            "\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}",
+                                    "\"to\":\"%s\",\"from\":\"%s\",\"data\":\"%s\"}",
                             item.getLangTo().getCode(),
                             item.getLangFrom().getCode(), item.getSource()));
-            return new Request.Builder()
+            Request request = new Request.Builder()
                     .url("https://api-b2b.backenster.com/b1/api/v3/translate")
                     .post(body)
                     .addHeader("accept", "application/json")
                     .addHeader("content-type", "application/json")
                     .addHeader("Authorization", "a_fhvZYBPKemWAf00YLModU78yhoTduTE6gDzuibkunlUmch4GO9lOZp0DImFijwpdqKpGK8r3s8laNkoM")
                     .build();
+
+            return request;
         }
 
         @Override
         protected void onPostExecute(String json) {
             super.onPostExecute(json);
-
-            String translation = parseJSON(json);
+            String translation;
+            try {
+                translation = parseJSON(json);
+            } catch (RuntimeException e) {
+                return;
+            }
             result.setText(translation);
             hideKeyboard();
 
@@ -356,7 +379,12 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         private String parseJSON(String s){
             try {
                 JSONObject jsonObject = new JSONObject(s);
-                return jsonObject.getString("result");
+                if(!jsonObject.getString("err").equals("null") ) {
+                    throw new RuntimeException();
+                } else {
+                    return jsonObject.getString("result");
+                }
+
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }

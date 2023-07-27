@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
 
 
+    android:id="@+id/fl_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/truffle_black">
@@ -39,10 +40,10 @@
         android:id="@+id/constraintLayout4"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:orientation="horizontal">
+        app:layout_constraintTop_toTopOf="parent">
 
     </LinearLayout>
 
@@ -61,8 +62,8 @@
             android:layout_height="110dp"
             android:layout_marginStart="25dp"
             android:background="@drawable/image_avatar_style"
-            android:scaleType="centerInside"
             android:contentDescription="@string/list_avatar"
+            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

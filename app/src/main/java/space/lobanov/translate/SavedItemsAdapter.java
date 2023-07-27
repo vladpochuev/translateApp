@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
-
-import space.lobanov.translate.Fragments.ListFragment;
 
 public class SavedItemsAdapter extends FirebaseRecyclerAdapter<SavedItem, SavedItemsAdapter.MyViewHolder> {
 
@@ -24,7 +21,8 @@ public class SavedItemsAdapter extends FirebaseRecyclerAdapter<SavedItem, SavedI
 
     @Override
     protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull SavedItem model) {
-        holder.tvLang.setText(model.getLangFrom() + " ➞ "+ model.getLangTo());
+        String message = model.getLangFrom() + " ➞ "+ model.getLangTo();
+        holder.tvLang.setText(message);
         holder.tvSource.setText(model.getSource());
         holder.tvResult.setText(model.getResult());
         holder.bDelete.setOnClickListener(l -> {
@@ -41,7 +39,7 @@ public class SavedItemsAdapter extends FirebaseRecyclerAdapter<SavedItem, SavedI
         return new MyViewHolder(view);
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvLang, tvSource, tvResult;
         ImageButton bDelete;
 
