@@ -12,6 +12,7 @@
     <string name="home_translate">translate</string>
     <string name="home_save_translation">Save translation</string>
     <string name="home_copy_result">Copy result</string>
+    <string name="home_on_click_copy">Copied to clipboard</string>
     <string name="home_translate_from">Translate from language</string>
     <string name="home_translate_to">Translate to language</string>
 

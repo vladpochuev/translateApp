@@ -218,7 +218,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
         ClipboardManager clipboard = (ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("text", result.getText());
         clipboard.setPrimaryClip(clip);
-        Toast.makeText(mActivity.getApplicationContext(), "Текст скопирован в буфер обмена", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mActivity.getApplicationContext(), R.string.home_on_click_copy, Toast.LENGTH_SHORT).show();
     }
 
     private void onClickSave() {
@@ -245,7 +245,7 @@ public class HomeFragment extends Fragment implements TextView.OnEditorActionLis
             String text = source.getText().toString().trim();
             new Translator().execute(text);
         } else {
-            Toast.makeText(mActivity, "Введите текст", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.home_enter_the_text, Toast.LENGTH_SHORT).show();
         }
     }
 
